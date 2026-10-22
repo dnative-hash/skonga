@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, intl, pdo_sqlite, pdo_pgsql, zip, bcmath
+          coverage: none
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Pint
+        run: vendor/bin/pint --test
+
+      - name: PHPStan (level 5)
+        run: vendor/bin/phpstan analyse --level=5 --memory-limit=1G
+
+      - name: Pest (SQLite in memory)
+        run: |
+          set -o pipefail
+          vendor/bin/pest --log-junit=pest-junit.xml 2>&1 | tee pest.log
+
+      # CI job logs cannot be read from the contributor sandbox, so a failing run
+      # also writes the end of the Pest output and each failing test as annotations.
+      - name: Report failing tests as annotations
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+
+          def esc(text):
+              return text.replace('%', '%25').replace('\r', '').replace('\n', '%0A')
+
+          if os.path.exists('pest.log'):
+              with open('pest.log', errors='replace') as handle:
+                  tail = ''.join(handle.readlines()[-80:])
+              print('::error title=Pest output (last lines)::' + esc(tail[-4000:]))
+              with open('pest.log', errors='replace') as handle:
+                  plain = re.sub(r'\x1b\[[0-9;]*m', '', handle.read())
+              failed = [line.strip() for line in plain.splitlines() if 'FAIL' in line or 'Error' in line or 'Exception' in line]
+              print('::error title=Pest failing lines::' + esc('\n'.join(failed)[:4000]))
+
+          try:
+              shown = 0
+              with open('pest-junit.xml', errors='replace') as handle:
+                  xml_text = re.sub('[\x00-\x08\x0b\x0c\x0e-\x1f]', '', handle.read())
+              for case in ET.fromstring(xml_text).iter('testcase'):
+                  for kind in ('failure', 'error'):
+                      node = case.find(kind)
+                      if node is not None and shown < 8:
+                          text = ' '.join(((node.get('message') or '') + ' ' + (node.text or '')).split())[:600]
+                          print('::error title=Pest: ' + esc(case.get('name') or '') + '::' + esc(text))
+                          shown += 1
+          except Exception as error:
+              print('::error title=Could not read pest-junit.xml::' + esc(repr(error)))
+          PY
+
+      - name: Composer audit
+        run: composer audit
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build

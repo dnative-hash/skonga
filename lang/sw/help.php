@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'title' => 'Kituo cha Msaada',
+    'subtitle' => 'Maelekezo hatua kwa hatua kwa kila kitu ndani ya Somaplus',
+    'search' => 'Tafuta',
+    'search_placeholder' => 'Unataka kufanya nini? mfano ongeza darasa, umesahau nenosiri',
+    'too_short' => 'Andika herufi angalau mbili ili kutafuta.',
+    'results_for' => 'Matokeo ya ":term"',
+    'nothing' => 'Hakuna maelekezo yaliyopatikana kwa ":term".',
+    'try_again' => 'Jaribu maneno machache au tofauti, au pitia mada.',
+    'browse_all' => 'Pitia mada zote',
+    'on_this_page' => 'Kwenye ukurasa huu',
+    'contact_title' => 'Wasiliana na huduma kwa wateja wa Odessa Lab',
+    'contact_copy' => 'Unahitaji msaada zaidi ya maelekezo haya? Wasiliana na timu yetu moja kwa moja.',
+    'contact_whatsapp' => 'Ongea kwenye WhatsApp',
+    'contact_call' => 'Piga 0761 595 780',
+    'contact_email' => 'Tuma barua pepe hello@odessalab.tech',
+    'contact_hours' => 'Saa za kazi: Jumatatu hadi Ijumaa, 8:00 asubuhi–6:00 jioni',
+    'categories' => [
+        'getting-started' => ['title' => 'Kuanza', 'description' => 'Ingia na ujue mahali pa kila kitu'],
+        'students' => ['title' => 'Wanafunzi', 'description' => 'Ongeza wanafunzi, walezi, historia ya madarasa na kuondoka shuleni'],
+        'attendance' => ['title' => 'Mahudhurio', 'description' => 'Chukua mahudhurio na uone wanafunzi wanahudhuria mara ngapi'],
+        'exams' => ['title' => 'Mitihani na alama', 'description' => 'Mizani ya madaraja, mitihani, kuingiza alama na kufunga'],
+        'fees' => ['title' => 'Ada na ankara', 'description' => 'Miundo ya ada, ankara na control number'],
+        'academics' => ['title' => 'Masomo', 'description' => 'Miaka ya masomo, mihula, madarasa, mikondo na mada'],
+        'account' => ['title' => 'Akaunti na wadhifa', 'description' => 'Nenosiri lako na kila wadhifa unaweza kufanya nini'],
+        'plans' => ['title' => 'Mipango na usajili', 'description' => 'Unatumika, muda wa neema na kusoma tu'],
+        'troubleshooting' => ['title' => 'Matatizo na majibu', 'description' => 'Suluhisho za haraka kwa matatizo ya kawaida'],
+    ],
+];
