@@ -18,8 +18,11 @@ return [
     'categories' => [
         'getting-started' => 'ti ti-rocket',
         'students' => 'ti ti-users',
+        'teachers' => 'ti ti-user-check',
         'attendance' => 'ti ti-checklist',
+        'library' => 'ti ti-books',
         'exams' => 'ti ti-file-certificate',
+        'communication' => 'ti ti-message',
         'fees' => 'ti ti-cash',
         'academics' => 'ti ti-school',
         'account' => 'ti ti-user-circle',

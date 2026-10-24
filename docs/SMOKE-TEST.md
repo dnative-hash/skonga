@@ -75,7 +75,7 @@ App\Models\User::factory()->superAdmin()->create(['name' => 'Root', 'email' => '
 5. The flag menu in the header switches between English and Kiswahili; menu, dashboard and error messages change, and the choice survives signing out.
 6. Set Acme to `read_only`: a yellow notice shows on every page, and signing in, signing out and reading still work.
 7. Dashboard figures: as the head teacher, the tiles show active students (not those who left), guardians, teachers and classes, `+N this month` for students admitted this month, and "Attendance today" splits today's register by status (or says none was recorded). The "People" doughnut counts pupils, teaching accounts and staff accounts, "Students by class" shows how many pupils each class holds in the current year, "Attendance of the last 30 days" draws the register of the month, and "Top students" lists the best pupils of the last locked exam with their average and their class position (it says no exam has results yet when there is none). As the accountant, the fee tiles, "Fees by month" chart and "Recent payments" show; reversing a payment on the Payments page lowers "Fees collected" and raises "Fees outstanding" by its amount. A teacher sees no fee blocks, an accountant no attendance block, and a parent or student account sees only the "Your school" card. Switch to Kiswahili: every dashboard label changes.
-8. Dashboard submenu: the sidebar's Dashboard opens School and, for owner, head teacher and teacher, Teacher. The Teacher page shows school-wide student and class counts, the marks that person entered, open exams, and a table of this year's exams with Enter marks (open) or Results (locked). An accountant opening `/dashboard/teacher` gets a 403. Switch to Kiswahili: the page changes.
+8. Dashboard submenu: the sidebar's Dashboard opens School and, for owner, head teacher and teacher, Teacher. The Teacher page shows school-wide student and class counts, the marks that person entered, open exams, and a table of this year's exams with Enter marks (open) or Results (locked). A person the school gave a teacher record shows what they teach there (subjects and classes, "Nothing assigned yet" without one). A person who may see the library also sees the Library block: copies on the shelf, copies out and the overdue ones in red, with a link to the copies out. An accountant opening `/dashboard/teacher` gets a 403. Switch to Kiswahili: the page changes.
 9. The sidebar shows only "Dashboard" and "Help". Other items appear as the features that own them are built.
 10. "Log out" in the profile menu returns to `/login`.
 11. Top bar: the orange "Add new" button opens the pages of the role. As owner: add student, import students, take attendance, new exam, grading scale, fee structure and record payment. As teacher: only "Take attendance". A parent or student account has no quick menu at all. The bell has a number when there is something to report: set the school to `grace` and the notice names the day the grace period ends, an exam of this year that is not locked and an invoice that is not paid in full are reported (the money one only to the accountant, the head teacher and the owner). A school in `read_only` is told so in the bell. The gear opens the settings for the owner and is not there for the other roles.
@@ -132,6 +132,36 @@ Sign in at `http://acme.localhost:8000` as the head teacher (`asha@acme.test`, c
 14. Guardians: the sidebar has Academics > Guardians with **Add New Guardian** and **Guardians List** (a teacher sees the list but not "Add New Guardian"; a parent/student sees neither and gets 403 on `/guardians`). The list is a datatable of the template: its own search box sits in the header of the card, with the page length, the sorting of the columns and the paging. **Add New Guardian** and the pencil of a row open a pop-up (the page is not loaded again; the pencil of the row fills the pop-up with that guardian). In the pop-up, a name, a phone and an email are typed and saved: a phone that is already in the school is refused and the pop-up opens again with what was typed. On the guardian's page, link a pupil with a relationship and as main contact; the pupil is listed with its class, and **Take off** unlinks them. A guardian who is left with no pupil is deleted; a guardian with a pupil is not (the delete is refused with a message).
 15. `select action, subject_type, subject_id, user_id from audit_logs` shows the actions above and no names.
 
+## Teachers
+
+1. Sign in as owner. The sidebar has Academics > Teachers with **Add teacher** and **Teacher list**. A teacher, an accountant and a parent/student do not see the entry and get 403 on `/teachers`; the head teacher sees the list and can add a teacher too.
+2. Add a teacher: the form is a pop-up of the list (the page is not loaded again). Fill in the name, the email and a password of 8+ characters, the phone and the staff number `TCH-001`, tick a subject and a class, save. The teacher is in the list with the name, the staff number, the phone, the subject and the class.
+3. The same email in the same school is refused, and so is the same staff number; the pop-up opens again with what was typed. An email that is already used at another school is accepted.
+4. The person signs in with that email and password and has the teacher menu (marks, attendance, and Library to look at: the pages open without the add or change buttons). Opening an exam's mark page, the **Class**, **Stream** and **Subject** lists hold only what was ticked in step 2. Entering marks for one of those saves; a hand-made post for a subject or a class the school did not tick answers 403 and saves nothing. The owner and the head teacher see and write everything.
+5. Open the teacher: the page shows the details, what the teacher teaches and the account. **Edit** opens a page; leave the password empty and the old password still works, type a new one and it replaces it.
+6. Search "ama" in the list: the address stays `/teachers/search` and shows no name. The filter shows only the teachers on duty or only those out of duty.
+7. **Put out of duty**: the teacher is marked as such in the list and the filter finds them. **Back in duty** undoes it.
+8. **Take out of the school**: the record and what it teaches are gone, the account stays and has no role any more, so the person can be given another role in Settings > Users. The marks the person entered keep their name.
+9. In a read-only school the pages open and every change answers 403. A teacher of another school gives 404.
+10. In Kiswahili all the pages are in Swahili; Help has the topic "Walimu" with one article.
+11. `select action, subject_id from audit_logs` shows the teacher actions with ids only and no names.
+
+## Library
+
+1. Sign in as owner. The sidebar has Academics > Library with **Add book**, **Book list**, **Library members** and **Issue and return**. The head teacher sees everything too. A teacher sees the pages (view only: no add, no edit, no delete, every posted change answers 403, and **Print library card** works) but an accountant and a parent/student neither see the entry nor get the pages.
+2. Add a book: the form is a pop-up of the book list. Fill in the name, a subject of the school, the number `BK-001`, the rack, 3 copies and the price `5500.50`; save. The book is in the list with **On the shelf: 3**. A price of another currency is saved with the decimals of the school.
+3. The same book number in the same school is refused, and so is a book without a name or copies; the pop-up opens again with what was typed.
+4. Add a member under **Library members**: choose a pupil (only the pupils without a card are in the list) and give the card `LIB-0001`. The list shows the pupil, their class, the phone of the guardian and the card. A second card for the same pupil and a second `LIB-0001` are refused.
+5. Under **Issue and return**, use **Issue a book**: the member is in the list with their card, only the copies on the shelf are choosable, and the **Return due** holds today plus 14 days. Save. The book now shows **On the shelf: 2** and the row shows the due day.
+6. Issue the last copy again for another member: the form refuses. A day in the future is refused too, and a return day before the issue day as well.
+7. **Bring back** on the open issue: the copy is on the shelf again and the row shows the day. Pressing it twice is refused.
+8. Open a member: the page shows the card, the class, the phone of the guardian and every borrowed book with its due day, brought back or still out. Issue one copy with a return day of yesterday: the list and the member's page mark the row **Overdue** in red. The search on each page is a POST to `/library/{books|members|issues}/search` and needs two letters.
+9. Open a member and press **Print library card**: a new tab shows the card on a sheet, with the school name, the name of the pupil, the card number with a barcode, the class and the year; browser print at A4 puts two cards across. Each print leaves an audit line `library.card_printed`. An accountant opening the card address gets 403; a teacher opening their member's card works.
+10. **Delete** a book the library ever lent, or a member the library ever gave a book: refused, because the history of the school stays. A book and a member without a record can be deleted.
+11. In a read-only school the pages open and every change answers 403. A member of another school gives 404.
+12. In Kiswahili all the pages are in Swahili; Help has the topic "Maktaba" with one article.
+12. `select action, subject_id from audit_logs` shows `book.*`, `member.*` and `issue.*` with ids only and no names.
+
 ## Attendance
 
 1. Sign in as a teacher. The sidebar has Academics > Attendance > Take attendance and Summary. An accountant does not see Attendance and gets 403 on `/attendance`.
@@ -143,6 +173,25 @@ Sign in at `http://acme.localhost:8000` as the head teacher (`asha@acme.test`, c
 7. In a read-only school the pages open but saving answers 403.
 8. In Kiswahili all pages are in Swahili; Help has the topic "Mahudhurio" with two articles.
 9. `select action, subject_id from audit_logs` shows `attendance.recorded`.
+
+## Timetable
+
+It needs the academic year with its term, the classes and streams, the subjects and the teachers of the sections above.
+
+1. Sign in as owner. The sidebar has Academics > Timetable with Class timetable, Teacher timetable, My timetable and Lesson slots. The head teacher sees the four pages and can change everything. A teacher sees the first three pages but has no Lesson slots, and every posted change (add lesson, edit, delete, copy, slots) answers 403. An accountant and a parent/student see no entry and get 403 on `/timetable`.
+2. Class timetable with no term in the year says "Add an academic year with a term first"; with a term but no slots it says the school has no lesson slots, with a link to Lesson slots.
+3. Lesson slots: add Period 1 from 08:00 to 08:40, Period 2 from 08:40 to 09:20, then the Tea break from 09:20 to 09:40 with **This is a break** ticked. A slot that ends before it starts, one that overlaps another slot of the day, or the same name twice is refused. Every class uses this one list.
+4. Class timetable, choose the term and Form 1: the grid holds the days Monday to Friday. **Add a lesson**: whole class (no stream), Mathematics, the teacher whose subject and class were assigned under Teachers, Monday, Period 1, Room 5. The card shows the subject, the teacher, the room and 08:00 - 08:40.
+5. A second lesson for Form 1 in Monday Period 1 (any subject) is refused; so is a lesson for stream A while the whole class has that slot, and the other way round. A teacher with a lesson for Form 2 in the same slot, or the same room used there, is refused. The Tea break as a slot is refused. A teacher out of duty, or one who was not assigned this subject or class under Teachers, is refused; a teacher with nothing assigned yet is accepted for anything. Each message says which of these it is.
+6. Add a lesson on Saturday: the Saturday column appears from then (Sunday as well). A day without lessons shows nothing.
+7. Teacher timetable: choose the teacher, the same lessons show with the class of each one. As the teacher, My timetable shows their own week; a person without a teacher record is told there are no lessons to show.
+8. Copy a term: copy Term 1 into Term 2. The message counts what was copied and what was skipped (a clash, or a teacher now out of duty), the class timetable of Term 2 shows the same lessons, and copying again adds nothing.
+9. Deleting a term, a class, a stream, a subject or a slot that still holds lessons is refused with a message; a slot in use cannot be turned into a break either, and moving it needs its lessons moved first.
+10. **Print** on the class, teacher, mine and family timetables: the controls, the header and the sidebar disappear in the print preview, which at A4 shows a one-week grid; saving the print preview as a PDF keeps the same.
+11. Take the teacher of step 4 out of the school: the lesson stays on the timetable with **No teacher yet**.
+12. Open the child of a parent that has access: a **Timetable** card/button opens the week of the child (class and stream, with the term choosable). A child of another parent answers 404; a teacher is forbidden.
+13. In a read-only school the pages open and every change answers 403. A class, a teacher or a child that is not of this school answers 404.
+14. Kiswahili: all the timetable pages are in Swahili; Help has the article "Ratiba ya masomo" (Timetable) under Masomo.
 
 ## Exams, marks and grades
 
@@ -257,11 +306,19 @@ Sign in at `http://acme.localhost:8000` as the head teacher (`asha@acme.test`, c
 ## SMS fee reminders
 
 1. As owner open Settings > Integrations > SMS to parents, provider NextSMS, enter username, password and sender name (3 to 11 characters), switch on, Save. Reload: the password is not shown.
-2. As accountant open Finance > Fees > Fee reminders: invoices with a balance are listed with the number of guardians that have a phone. An invoice whose guardians have no valid phone cannot be ticked.
+2. As accountant open Communication > Fee reminders: invoices with a balance are listed with the number of guardians that have a phone. An invoice whose guardians have no valid phone cannot be ticked.
 3. Tick one invoice, language Kiswahili, Send reminders: the status line shows 1 queued; the guardian's phone receives an SMS naming the school, student and balance; "Latest reminders" shows Sent.
 4. Send again the same day: nothing new is sent ("already reminded today"). Record a full payment on the invoice: it disappears from the list.
 5. Switch SMS off in Settings: sending is refused with a message pointing to Integrations. A teacher or head teacher gets 403 on the page; a read-only school can open it but cannot send.
 6. Kiswahili: page, statuses and Help > Ada na ankara > "Wakumbushe wazazi ada kwa SMS" are in Swahili.
+
+## Communication: notice board, events and messages
+
+1. As owner open Communication in the sidebar: Notices, Events, Messages and Fee reminders sit under the one section (fee reminders used to live under Finance > Fees; they moved to the Communication section).
+2. As owner put up a notice (a day, a title and a description). The teacher, the accountant and the head teacher all read the board; a notice whose day is older sits below the newer ones. Edit or take the notice down; a teacher or accountant who posts or deletes gets 403.
+3. As head teacher add an event ("Parents meeting" on this month). The calendar marks today and shows the event on its day; the arrows move a month back and forth; "Coming up" lists the meeting at the side; an end before a start is refused.
+4. Another school's notice or event id gives 404 on this school's address; the message of another school is never listed.
+5. As accountant open Communication > Messages: the reminders sent are listed with the day, the student, the guardian and the status, and the reason for a failed one; the filter of status refuses everything else. Only the owner and the accountant may open it; the teacher and the parent student get 403.
 
 ## Family pages (parents)
 

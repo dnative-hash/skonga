@@ -100,6 +100,24 @@ return [
                     ],
                 ],
                 [
+                    'label' => 'menu.teachers',
+                    'icon' => 'ti ti-user-check',
+                    'children' => [
+                        [
+                            'label' => 'menu.add_teacher',
+                            'route' => 'teachers.create',
+                            'permission' => 'teachers.manage',
+                            'active' => ['teachers.create'],
+                        ],
+                        [
+                            'label' => 'menu.teacher_list',
+                            'route' => 'teachers.index',
+                            'permission' => 'teachers.view',
+                            'active' => ['teachers.index', 'teachers.search', 'teachers.show', 'teachers.edit'],
+                        ],
+                    ],
+                ],
+                [
                     'label' => 'menu.attendance',
                     'icon' => 'ti ti-checklist',
                     'children' => [
@@ -136,6 +154,36 @@ return [
                     ],
                 ],
                 [
+                    'label' => 'menu.timetable',
+                    'icon' => 'ti ti-calendar-time',
+                    'children' => [
+                        [
+                            'label' => 'menu.class_timetable',
+                            'route' => 'timetable.index',
+                            'permission' => 'timetable.view',
+                            'active' => ['timetable.index', 'timetable.entries.*', 'timetable.copy'],
+                        ],
+                        [
+                            'label' => 'menu.teacher_timetable',
+                            'route' => 'timetable.teachers',
+                            'permission' => 'timetable.view',
+                            'active' => ['timetable.teachers'],
+                        ],
+                        [
+                            'label' => 'menu.my_timetable',
+                            'route' => 'timetable.mine',
+                            'permission' => 'timetable.view',
+                            'active' => ['timetable.mine'],
+                        ],
+                        [
+                            'label' => 'menu.timetable_periods',
+                            'route' => 'timetable.periods.index',
+                            'permission' => 'timetable.manage',
+                            'active' => ['timetable.periods.*'],
+                        ],
+                    ],
+                ],
+                [
                     'label' => 'menu.academic_years',
                     'icon' => 'ti ti-calendar-event',
                     'route' => 'academics.years.index',
@@ -160,6 +208,73 @@ return [
                         ],
                     ],
                 ],
+                [
+                    'label' => 'menu.library',
+                    'icon' => 'ti ti-books',
+                    'children' => [
+                        [
+                            'label' => 'menu.add_book',
+                            'route' => 'library.books.create',
+                            'permission' => 'library.manage',
+                            'active' => ['library.books.create'],
+                        ],
+                        [
+                            'label' => 'menu.book_list',
+                            'route' => 'library.books.index',
+                            'permission' => 'library.view',
+                            'active' => ['library.books.*'],
+                        ],
+                        [
+                            'label' => 'menu.library_members',
+                            'route' => 'library.members.index',
+                            'permission' => 'library.view',
+                            'active' => ['library.members.*'],
+                        ],
+                        [
+                            'label' => 'menu.issue_return',
+                            'route' => 'library.issues.index',
+                            'permission' => 'library.view',
+                            'active' => ['library.issues.*'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        [
+            'label' => 'menu.sections.communication',
+            'items' => [
+                [
+                    'label' => 'menu.notice_board',
+                    'icon' => 'ti ti-notes',
+                    'children' => [
+                        [
+                            'label' => 'menu.notices',
+                            'route' => 'communication.notices.index',
+                            'permission' => 'communication.view',
+                            'active' => ['communication.notices.*'],
+                        ],
+                    ],
+                ],
+                [
+                    'label' => 'menu.events',
+                    'icon' => 'ti ti-calendar-event',
+                    'route' => 'communication.events.index',
+                    'permission' => 'communication.view',
+                    'active' => ['communication.events.*'],
+                ],
+                [
+                    'label' => 'menu.messages',
+                    'icon' => 'ti ti-message',
+                    'route' => 'communication.messages.index',
+                    'permission' => 'reminders.send',
+                    'active' => ['communication.messages.*'],
+                ],
+                [
+                    'label' => 'menu.fee_reminders',
+                    'route' => 'communication.reminders.index',
+                    'permission' => 'reminders.send',
+                    'active' => ['communication.reminders.*'],
+                ],
             ],
         ],
         [
@@ -180,12 +295,6 @@ return [
                             'route' => 'fees.payments.index',
                             'permission' => 'fees.view',
                             'active' => ['fees.payments.*', 'fees.receipts.*'],
-                        ],
-                        [
-                            'label' => 'menu.fee_reminders',
-                            'route' => 'communication.reminders.index',
-                            'permission' => 'reminders.send',
-                            'active' => ['communication.reminders.*'],
                         ],
                         [
                             'label' => 'menu.collections_report',
