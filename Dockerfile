@@ -36,8 +36,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /var/www/html
 COPY . .
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
-    && mkdir -p storage/app/private storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+RUN mkdir -p storage/app/private storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
     && php artisan storage:link \
     && chown -R www-data:www-data storage bootstrap/cache
 
